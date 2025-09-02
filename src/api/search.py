@@ -1,12 +1,15 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
 from src.firebase_utils import get_firestore
 from src.core.nltk_tokenizer import nltk_tokenizer
 from src.models.schemas import Video, VideoResponse
+from src.core.rate_limiter import limiter
 
 router = APIRouter()
 
 @router.get("/search", response_model=VideoResponse)
+@limiter.limit("100/minute") 
 async def search_content(
+    request: Request,
     query: str,
     page: int = Query(1, ge=1),
     limit: int = Query(10, le=50)

@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
 from src.firebase_utils import get_firestore
 from src.models.schemas import VideoResponse, Video
+from src.core.rate_limiter import limiter
 
 router = APIRouter()
 
 @router.get("/videos", response_model=VideoResponse)
+@limiter.limit("100/minute") 
 async def get_videos(
+    request: Request,
     limit: int = Query(10, ge=1, le=50, description="Number of videos per page"),
     page: int = Query(1, ge=1, description="Page number (starts at 1)"),
 ):
