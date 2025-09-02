@@ -9,15 +9,14 @@ Before you start, make sure you have the following installed:
 
 - [Python 3.11+](https://www.python.org/downloads/) (if running locally without Docker)  
 - [Docker](https://www.docker.com/get-started) (recommended)  
-- A valid `serviceAccount.json` file for Firebase.
-
+- Place a valid `serviceAccount.json` file for Firebase in the root of the project.
 
 ---
 
 ## Getting Started
 
 ### Add Firebase Credentials
-Place your `serviceAccount.json` file in the **root of the project**. 
+Place your `serviceAccount.json` file in the **root of the project**.  
 
 ---
 
@@ -51,6 +50,7 @@ uvicorn src.main:app --reload
 
 Go to : [http://localhost:8000/docs](http://localhost:8000/docs)
 
+---
 
 ## Run with Docker
 
@@ -61,9 +61,18 @@ Run this in the project root:
 docker build -t youtube-ir-system .
 ````
 
-### Start the Container
+### Stop Previous Container (if any)
 
-Run the container and expose it on port `8000`:
+If you already have a container with the same name running, stop and remove it first:
+
+```bash
+docker stop youtube-ir-system || true
+docker rm youtube-ir-system || true
+```
+
+### Run the Docker Container
+
+Now start the container:
 
 ```bash
 docker run -p 8000:8000 --name youtube-ir-system youtube-ir-system
@@ -75,3 +84,7 @@ Open your browser at : [http://localhost:8000/docs](http://localhost:8000/docs)
 You’ll see the **Swagger UI** to test all APIs. Logs will also show in your terminal.
 
 ---
+
+## Thank You ❤️
+
+Thanks for checking out this project! 

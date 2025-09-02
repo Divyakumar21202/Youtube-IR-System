@@ -8,7 +8,7 @@ from src.core.nltk_tokenizer import nltk_tokenizer
 # Todo: Replace with a fresh API key before final submission
 YOUTUBE_API_KEY = "AIzaSyAkWeMtybNkHzvHlFCLueqX6f7qG_6Lx6w"
 # Predefined search query for YouTube API
-SEARCH_QUERY = "cricket"
+SEARCH_QUERY = "news"
 # Base URL for YouTube Data API v3
 BASE_URL = "https://www.googleapis.com/youtube/v3/search"
 
