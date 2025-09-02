@@ -6,7 +6,7 @@ from src.core.rate_limiter import limiter
 router = APIRouter()
 
 @router.get("/videos", response_model=VideoResponse)
-@limiter.limit("100/minute") 
+@limiter.limit("10/minute") 
 async def get_videos(
     request: Request,
     limit: int = Query(10, ge=1, le=50, description="Number of videos per page"),

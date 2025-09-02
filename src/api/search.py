@@ -7,7 +7,7 @@ from src.core.rate_limiter import limiter
 router = APIRouter()
 
 @router.get("/search", response_model=VideoResponse)
-@limiter.limit("100/minute") 
+@limiter.limit("10/minute") 
 async def search_content(
     request: Request,
     query: str,
