@@ -66,8 +66,8 @@ docker build -t youtube-ir-system .
 If you already have a container with the same name running, stop and remove it first:
 
 ```bash
-docker stop youtube-ir-system || true
-docker rm youtube-ir-system || true
+docker stop youtube-ir-system
+docker rm youtube-ir-system
 ```
 
 ### Run the Docker Container
