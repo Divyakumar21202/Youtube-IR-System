@@ -4,17 +4,18 @@ from fastapi import FastAPI
 import src.api.routes as routes
 from src.firebase_utils import close_firebase, init_firebase
 from src.core.schedular import app_scheduler
+from src.core.logger import logger
 
 # Lifespan context (startup + shutdown)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app_scheduler.start()
-    print("FastAPI app started and scheduler is running")
+    logger.info("FastAPI app started and scheduler is running")
     init_firebase()
     yield
     close_firebase()
     app_scheduler.shutdown()
-    print("Scheduler stopped")
+    logger.info("Scheduler stopped")
 
 # FastAPI app
 app = FastAPI(

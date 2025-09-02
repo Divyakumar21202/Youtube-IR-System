@@ -4,6 +4,8 @@ from datetime import datetime, timedelta, timezone
 from src.firebase_utils import get_firestore
 from firebase_admin import firestore
 from src.core.nltk_tokenizer import nltk_tokenizer
+from src.core.logger import logger
+
 
 # -----------------------------
 # API Key Management
@@ -69,13 +71,13 @@ async def fetch_latest_videos():
         try:
             resp = await client.get(BASE_URL, params=params, timeout=10)
             if resp.status_code == 403:
-                print(f"API key exhausted: {api_key}, removing...")
+                logger.info(f"API key exhausted: {api_key}, removing...")
                 remove_api_key(api_key)
                 return await fetch_latest_videos()  # Retry with next key
             resp.raise_for_status()
             data = resp.json()
         except httpx.HTTPError as e:
-            print(f"Error fetching videos: {e}")
+            logger.error(f"Error fetching videos: {e}")
             return []
 
     videos = []
@@ -114,17 +116,17 @@ async def save_videos_to_firestore(videos):
                               .document(v["id"])
                               .set(v)
         )
-    print(f"Saved {len(videos)} videos to Firestore")
+    logger.info(f"Saved {len(videos)} videos to Firestore")
 
 # -----------------------------
 # Combined task for scheduler
 # -----------------------------
 async def fetch_and_save_videos():
     if not YOUTUBE_API_KEYS:
-        print("No valid API keys left. Stopping fetch.")
+        logger.info("No valid API keys left. Stopping fetch.")
         return
     videos = await fetch_latest_videos()
     if videos:
         await save_videos_to_firestore(videos)
     else:
-        print("No videos uploaded in past few seconds!")
+        logger.info("No videos uploaded in past few seconds!")
