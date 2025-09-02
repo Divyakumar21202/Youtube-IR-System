@@ -5,9 +5,38 @@ from src.firebase_utils import get_firestore
 from firebase_admin import firestore
 from src.core.nltk_tokenizer import nltk_tokenizer
 
-# Todo: Replace with a fresh API key before final submission
-YOUTUBE_API_KEY = "AIzaSyAkWeMtybNkHzvHlFCLueqX6f7qG_6Lx6w"
-# Predefined search query for YouTube API
+# -----------------------------
+# API Key Management
+# -----------------------------
+YOUTUBE_API_KEYS = [
+    "AIzaSyBYiUmQUS8kldCkshqxH5iI-pGB5nWY34Y",
+    "AIzaSyA4-Lylxxgs10xxPcrGJazsXKUmn62z_2I",
+    "AIzaSyCw_PnUJKCkO3aPDcnZP2XpOfUP9dOr0xM",
+    "AIzaSyDnuUDLySpf3E3iZQ0o7kAFcbRAzwIrSdk",
+]
+current_key_index = 0
+
+def get_next_api_key():
+    """Round-robin key selection"""
+    global current_key_index, YOUTUBE_API_KEYS
+    if not YOUTUBE_API_KEYS:
+        raise RuntimeError("No valid YouTube API keys available!")
+
+    key = YOUTUBE_API_KEYS[current_key_index]
+    current_key_index = (current_key_index + 1) % len(YOUTUBE_API_KEYS)
+    return key
+
+def remove_api_key(key: str):
+    """Remove exhausted key from the pool"""
+    global YOUTUBE_API_KEYS, current_key_index
+    if key in YOUTUBE_API_KEYS:
+        YOUTUBE_API_KEYS.remove(key)
+        # Adjust index so it doesn’t go out of range
+        current_key_index %= max(len(YOUTUBE_API_KEYS), 1)
+
+# -----------------------------
+# Other Config
+# -----------------------------
 SEARCH_QUERY = "news"
 # Base URL for YouTube Data API v3
 BASE_URL = "https://www.googleapis.com/youtube/v3/search"
@@ -23,6 +52,8 @@ last_fetched_time = datetime.now(timezone.utc)
 # -----------------------------
 async def fetch_latest_videos():
     global last_fetched_time
+    api_key = get_next_api_key()
+
     params = {
         "part": "snippet",
         "q": SEARCH_QUERY,
@@ -30,13 +61,17 @@ async def fetch_latest_videos():
         "order": "date",
         "publishedAfter": last_fetched_time.isoformat(),
         "maxResults": 5,
-        "key": YOUTUBE_API_KEY,
+        "key": api_key,
     }
 
     # Async HTTP request to fetch videos
     async with httpx.AsyncClient() as client:
         try:
             resp = await client.get(BASE_URL, params=params, timeout=10)
+            if resp.status_code == 403:
+                print(f"API key exhausted: {api_key}, removing...")
+                remove_api_key(api_key)
+                return await fetch_latest_videos()  # Retry with next key
             resp.raise_for_status()
             data = resp.json()
         except httpx.HTTPError as e:
@@ -85,6 +120,9 @@ async def save_videos_to_firestore(videos):
 # Combined task for scheduler
 # -----------------------------
 async def fetch_and_save_videos():
+    if not YOUTUBE_API_KEYS:
+        print("No valid API keys left. Stopping fetch.")
+        return
     videos = await fetch_latest_videos()
     if videos:
         await save_videos_to_firestore(videos)
