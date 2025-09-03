@@ -15,6 +15,9 @@ YOUTUBE_API_KEYS = [
     "AIzaSyA4-Lylxxgs10xxPcrGJazsXKUmn62z_2I",
     "AIzaSyCw_PnUJKCkO3aPDcnZP2XpOfUP9dOr0xM",
     "AIzaSyDnuUDLySpf3E3iZQ0o7kAFcbRAzwIrSdk",
+    "AIzaSyCm5cJ64-NyCH0PwEvcL8kxtgE6z00SflI",
+    "AIzaSyBvZHQLCbguEkVjx-rWlw4kxrKb7kauCTI",
+    "AIzaSyD6iwD0537Of40BiyCS56mdkEPrGUoYLrg",
 ]
 current_key_index = 0
 
